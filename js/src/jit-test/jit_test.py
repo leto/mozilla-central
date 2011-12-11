@@ -51,6 +51,7 @@ class Test:
         self.allow_oom = False # True means that OOM is not considered a failure
         self.valgrind = False  # True means run under valgrind
         self.error = ''        # Errors to expect and consider passing
+        self.markstack = ''    # Value of JS_MARK_STACK_SIZE env var to pass
 
     def copy(self):
         t = Test(self.path)
@@ -59,6 +60,7 @@ class Test:
         t.allow_oom = self.allow_oom
         t.valgrind = self.valgrind
         t.error = self.error
+        t.markstack = self.markstack
         return t
 
     COOKIE = '|jit-test|'
@@ -81,6 +83,8 @@ class Test:
                     value = value.strip()
                     if name == 'error':
                         test.error = value
+                    elif name == 'markstack':
+                        test.markstack = value
                     else:
                         print('warning: unrecognized |jit-test| attribute %s'%part)
                 else:
@@ -198,6 +202,9 @@ def run_cmd_avoid_stdio(cmdline, env, timeout):
 
 def run_test(test, lib_dir, shell_args):
     cmd = get_test_cmd(test.path, test.jitflags, lib_dir, shell_args)
+
+    if test.markstack:
+        env['JS_MARK_STACK_SIZE'] = test.markstack
 
     if (test.valgrind and
         any([os.path.exists(os.path.join(d, 'valgrind'))
