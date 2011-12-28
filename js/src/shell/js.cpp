@@ -1301,11 +1301,7 @@ InternalConst(JSContext *cx, uintN argc, jsval *vp)
         JS_ReportError(cx, "the function takes exactly one argument");
         return false;
     }
-    char *mark_stack_size = "000000000000000";
     size_t stack_size = js::OBJECT_MARK_STACK_SIZE;
-
-    // allow up to 16 digit numbers by default
-    static const size_t MAX_MARK_STACK_SIZE_LENGTH = 16;
 
     JSString *str = JS_ValueToString(cx, vp[2]);
     if (!str)
@@ -1314,10 +1310,8 @@ InternalConst(JSContext *cx, uintN argc, jsval *vp)
     if (!flat)
         return false;
 
-    strncpy(mark_stack_size, getenv("JS_MARK_STACK_SIZE"), MAX_MARK_STACK_SIZE_LENGTH);
-
-    if (atoi(mark_stack_size) > 0)
-        stack_size      = atoi(mark_stack_size);
+    if (atoi(getenv("JS_MARK_STACK_SIZE")) > 0)
+        stack_size      = atoi(getenv("JS_MARK_STACK_SIZE"));
 
     if (JS_FlatStringEqualsAscii(flat, "OBJECT_MARK_STACK_LENGTH")) {
         vp[0] = UINT_TO_JSVAL(stack_size / sizeof(JSObject *));
