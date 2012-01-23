@@ -1732,7 +1732,7 @@ namespace js {
  * from the stack until it empties.
  */
 
-GCMarker::GCMarker(JSContext *cx)
+GCMarker::GCMarker(JSContext *cx, size_t mark_stack_size)
   : color(BLACK),
     unmarkedArenaStackTop(NULL),
     objStack(cx->runtime->gcMarkStackObjs, sizeof(cx->runtime->gcMarkStackObjs)),
@@ -2670,7 +2670,7 @@ MarkAndSweep(JSContext *cx, JSGCInvocationKind gckind)
 
     AutoUnlockGC unlock(rt);
 
-    GCMarker gcmarker(cx);
+    GCMarker gcmarker(cx, mark_stack_size);
     JS_ASSERT(IS_GC_MARKING_TRACER(&gcmarker));
     JS_ASSERT(gcmarker.getMarkColor() == BLACK);
     rt->gcIncrementalTracer = &gcmarker;
@@ -3284,7 +3284,7 @@ struct VerifyTracer : JSTracer {
     /* A dummy marker used for the write barriers; stored in gcMarkingTracer. */
     GCMarker gcmarker;
 
-    VerifyTracer(JSContext *cx) : nodemap(cx), gcmarker(cx) {}
+    VerifyTracer(JSContext *cx) : nodemap(cx), gcmarker(cx, mark_stack_size) {}
 };
 
 /*
