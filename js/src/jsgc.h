@@ -1661,7 +1661,7 @@ struct GCMarker : public JSTracer {
     MarkStack<LargeMarkItem> largeStack;
 
   public:
-    explicit GCMarker(JSContext *cx);
+    explicit GCMarker(JSContext *cx, size_t mark_stack_size);
     ~GCMarker();
 
     uint32 getMarkColor() const {
