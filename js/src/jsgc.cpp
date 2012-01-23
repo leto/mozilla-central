@@ -2670,6 +2670,10 @@ MarkAndSweep(JSContext *cx, JSGCInvocationKind gckind)
 
     AutoUnlockGC unlock(rt);
 
+    size_t mark_stack_size;
+    if (atoi(getenv("JS_MARK_STACK_SIZE")) > 0)
+        mark_stack_size      = atoi(getenv("JS_MARK_STACK_SIZE"));
+
     GCMarker gcmarker(cx, mark_stack_size);
     JS_ASSERT(IS_GC_MARKING_TRACER(&gcmarker));
     JS_ASSERT(gcmarker.getMarkColor() == BLACK);
@@ -3284,7 +3288,8 @@ struct VerifyTracer : JSTracer {
     /* A dummy marker used for the write barriers; stored in gcMarkingTracer. */
     GCMarker gcmarker;
 
-    VerifyTracer(JSContext *cx) : nodemap(cx), gcmarker(cx, mark_stack_size) {}
+    // todo: pass in proper mark stack size?
+    VerifyTracer(JSContext *cx) : nodemap(cx), gcmarker(cx, 42) {}
 };
 
 /*
